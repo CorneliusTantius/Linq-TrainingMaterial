@@ -8,5 +8,6 @@ namespace linq_training.Model
     {
         public string StudentId { get; set; }
         public List<string> Courses { get; set; }
+        public string CourseSetId { get; set; }
     }
 }

@@ -21,15 +21,16 @@ namespace linq_training
 
         private static List<Course> courseList = new List<Course>
         {
-            new Course() { StudentId="001", Courses=new List<string>{"COMP001", "COMP123"} },
-            new Course() { StudentId="003", Courses=new List<string>{"COMP021", "COMP123"} },
-            new Course() { StudentId="005", Courses=new List<string>{"COMP002", "COMP012"} },
-            new Course() { StudentId="007", Courses=new List<string>{"COMP003", "COMP001"} }
+            new Course() { StudentId="001", Courses=new List<string>{"COMP001", "COMP123"}, CourseSetId = "100"},
+            new Course() { StudentId="003", Courses=new List<string>{"COMP021", "COMP123"}, CourseSetId = "200" },
+            new Course() { StudentId="005", Courses=new List<string>{"COMP002", "COMP012"}, CourseSetId = "300" },
+            new Course() { StudentId="007", Courses=new List<string>{"COMP003", "COMP001"}, CourseSetId = "400" },
+            new Course() { StudentId="007", Courses=new List<string>{"COMP021", "COMP123"}, CourseSetId = "200" }
         };
 
         static void Main(string[] args)
         {
-            linqSelectMany();
+            linqGroupJoin();
         }
 
         // actual linq query
@@ -131,8 +132,68 @@ namespace linq_training
    
         static void linqSelectMany()
         {
-
+            var data = courseList.SelectMany(s => s.Courses).ToList();
+            foreach(string i in data)
+            {
+                Console.WriteLine(i);
+            }
         }
 
+        static void linqJoin()
+        {
+            var data = studentList.Join(courseList,
+                keyStudentList => keyStudentList.StudentId,
+                keyCourseList => keyCourseList.StudentId,
+                (s1, s2) => new
+                {
+                    s1.StudentId, s1.StudentName,
+                    s1.StudentGender, s2.Courses
+                }
+            ).ToList();
+            foreach(var i in data)
+            {
+                Console.WriteLine($"> {i.StudentId}|{i.StudentName} {i.StudentGender} Courses:");
+                foreach(string j in i.Courses)
+                {
+                    Console.WriteLine(j);
+                }
+            }
+        }
+
+        static void linqGroupJoin()
+        {
+            var data = studentList.GroupJoin(courseList,
+                leftkey => leftkey.StudentId,
+                rightkey => rightkey.StudentId,
+                (s1, s2) => new
+                {
+                    s1.StudentId,
+                    s1.StudentName,
+                    s2
+                }
+            );
+            foreach(var i in data)
+            {
+                Console.Write("> ");
+                Console.WriteLine(i.StudentId);
+                if(i.s2.Count() != 0)
+                {
+                    Console.WriteLine($"User has {i.s2.Count()}. those courses set are:");
+                    foreach(Course j in i.s2)
+                    {
+                        Console.Write($"-");
+                        foreach(string courescode in j.Courses)
+                        {
+                            Console.Write($" {courescode}");
+                        }
+                        Console.WriteLine();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No course for specified student!");
+                }
+            }
+        }
     }
 }
