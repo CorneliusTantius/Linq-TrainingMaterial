@@ -1,4 +1,4 @@
-# linq-training
+# Language Integrated Query (LINQ) Training Materials
 Comprehensive linq training materials.
 
 ## Usage
