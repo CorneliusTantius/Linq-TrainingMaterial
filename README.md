@@ -17,3 +17,6 @@ LINQ methods included are:
 - SelectMany
 - Join
 - GroupJoin
+
+### Copyright © 2021 Cornelius Tantius 
+All rights Reserved
