@@ -25,7 +25,8 @@ namespace linq_training
             new Course() { StudentId="003", Courses=new List<string>{"COMP021", "COMP123"}, CourseSetId = "200" },
             new Course() { StudentId="005", Courses=new List<string>{"COMP002", "COMP012"}, CourseSetId = "300" },
             new Course() { StudentId="007", Courses=new List<string>{"COMP003", "COMP001"}, CourseSetId = "400" },
-            new Course() { StudentId="007", Courses=new List<string>{"COMP021", "COMP123"}, CourseSetId = "200" }
+            new Course() { StudentId="007", Courses=new List<string>{"COMP021", "COMP123"}, CourseSetId = "200" },
+            new Course() { StudentId="002", Courses=new List<string>{"COMP012", "COMP124"}, CourseSetId = "500" }
         };
 
         static void Main(string[] args)
@@ -38,19 +39,19 @@ namespace linq_training
         // select StudentName, StudentAge from studentList
         static void linqSelect()
         {
-            var data = studentList.Select( s => new { s.StudentName, s.StudentAge } ).ToList();
+            var data = studentList.Select(s => new { s.StudentName, s.StudentAge }).ToList();
             foreach (var i in data)
             {
                 Console.WriteLine($"> studentname: {i.StudentName}, age: {i.StudentAge}");
             }
         }
-        
+
         // select * from studentList where StudentAge >= 18
         static void linqWhere()
         {
             var data = studentList.Where(
-                p => p.StudentAge >= 18 && 
-                    p.StudentAge < 20 && 
+                p => p.StudentAge >= 18 &&
+                    p.StudentAge < 20 &&
                     p.StudentGender == "F"
             ).ToList();
             foreach (var i in data)
@@ -90,12 +91,12 @@ namespace linq_training
             var data = studentList.
                 Where(p => blacklistedStudent.Contains(p.StudentName)).
                 Select(s => s.StudentId).ToList();
-            foreach(string i in data)
+            foreach (string i in data)
             {
                 Console.WriteLine(i);
             }
         }
-    
+
         static void linqAllAny()
         {
             bool testAll = studentList.All(p => p.StudentGender == "M");
@@ -103,7 +104,7 @@ namespace linq_training
             Console.WriteLine(testAll);
             Console.WriteLine(testAny);
         }
-        
+
         static void linqCountMax()
         {
             // Count() -> method
@@ -116,24 +117,24 @@ namespace linq_training
             var data = studentList.Select(s => s.StudentAge).ToList();
             Console.WriteLine(data.Max());
         }
-        
+
         static void linqGroupBy()
         {
             var data = studentList.GroupBy(p => p.StudentGender).ToList();
-            foreach(var i in data)
+            foreach (var i in data)
             {
                 Console.WriteLine(i.Key);
-                foreach(Student j in i)
+                foreach (Student j in i)
                 {
                     Console.WriteLine(j.StudentName);
                 }
             }
         }
-   
+
         static void linqSelectMany()
         {
             var data = courseList.SelectMany(s => s.Courses).ToList();
-            foreach(string i in data)
+            foreach (string i in data)
             {
                 Console.WriteLine(i);
             }
@@ -146,14 +147,16 @@ namespace linq_training
                 keyCourseList => keyCourseList.StudentId,
                 (s1, s2) => new
                 {
-                    s1.StudentId, s1.StudentName,
-                    s1.StudentGender, s2.Courses
+                    s1.StudentId,
+                    s1.StudentName,
+                    s1.StudentGender,
+                    s2.Courses
                 }
             ).ToList();
-            foreach(var i in data)
+            foreach (var i in data)
             {
                 Console.WriteLine($"> {i.StudentId}|{i.StudentName} {i.StudentGender} Courses:");
-                foreach(string j in i.Courses)
+                foreach (string j in i.Courses)
                 {
                     Console.WriteLine(j);
                 }
@@ -172,17 +175,17 @@ namespace linq_training
                     s2
                 }
             );
-            foreach(var i in data)
+            foreach (var i in data)
             {
                 Console.Write("> ");
                 Console.WriteLine(i.StudentId);
-                if(i.s2.Count() != 0)
+                if (i.s2.Count() != 0)
                 {
                     Console.WriteLine($"User has {i.s2.Count()}. those courses set are:");
-                    foreach(Course j in i.s2)
+                    foreach (Course j in i.s2)
                     {
                         Console.Write($"-");
-                        foreach(string courescode in j.Courses)
+                        foreach (string courescode in j.Courses)
                         {
                             Console.Write($" {courescode}");
                         }
@@ -193,6 +196,25 @@ namespace linq_training
                 {
                     Console.WriteLine("No course for specified student!");
                 }
+            }
+        }
+
+        static void linqSubQuery()
+        {
+            // selecting students with 'certain' groupSetId 
+            var data = studentList.Where(p =>
+                courseList.Where(p => p.groupSetId == "200")
+                    .Select(s => s.StudentId)
+                    .Contains(p.StudentId)
+            ).Select(s => new
+            {
+                s.StudentId,
+                s.StudentName
+            });
+            foreach (var i in data)
+            {
+                Console.Write("> ");
+                Console.WriteLine(i.StudentId + " - " + i.StudentName);
             }
         }
     }
